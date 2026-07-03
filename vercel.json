@@ -1,0 +1,18 @@
+{
+  "regions": ["gru1"],
+  "functions": {
+    "app/api/whatsapp/webhook/route.ts": {
+      "maxDuration": 90
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/agenda/lembretes",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/mensagens-auto",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

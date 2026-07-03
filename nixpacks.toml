@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ['nodejs_20', 'npm-9_x']
+
+[phases.install]
+cmds = ['npm ci']
+
+[phases.build]
+cmds = ['npm run build']
+
+[start]
+cmd = 'cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static && node .next/standalone/server.js'

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Luno brand */
+  --color-luno-marrom:       #4f46e5;
+  --color-luno-marrom-dark:  #3730a3;
+  --color-luno-dourado:      #94a3b8;
+  --color-luno-bege:         #64748b;
+
+  /* Sistema UI — fundo claro */
+  --color-ui-bg:        #f8fafc;
+  --color-ui-card:      #FFFFFF;
+  --color-ui-border:    #e2e8f0;
+  --color-ui-border-lt: #f1f5f9;
+  --color-ui-text:      #0f172a;
+  --color-ui-muted:     #64748b;
+  --color-ui-hover:     #f8fafc;
+
+  /* Status */
+  --color-status-green-bg:  #EDF5E8;
+  --color-status-green-tx:  #2D6A1A;
+  --color-status-amber-bg:  #fffbeb;
+  --color-status-amber-tx:  #b45309;
+  --color-status-blue-bg:   #EEF4FB;
+  --color-status-blue-tx:   #1A4080;
+  --color-status-red-bg:    #FEF0EE;
+  --color-status-red-tx:    #8B1A1A;
+  --color-status-gray-bg:   #F3F0ED;
+  --color-status-gray-tx:   #6B5344;
+
+  /* Tipografia */
+  --font-display: var(--font-playfair), serif;
+  --font-body:    var(--font-montserrat), sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+/* Animações tecnológicas — prontuário escuta */
+@keyframes bar-pulse {
+  0%, 100% { transform: scaleY(0.1); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes scan-x {
+  0% { left: -20%; }
+  100% { left: 120%; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

@@ -11,11 +11,15 @@ function supa() {
 export async function GET() {
   const empresaId = await getEmpresaId()
   const supabase = supa()
-  const { data: cfg } = await supabase.from('wa_config').select('*').eq('empresa_id', empresaId).limit(1).single()
-  if (!cfg) return Response.json({ error: 'wa_config não encontrada' }, { status: 500 })
+  const { data: cfg } = await supabase.from('wa_config').select('instance_name').eq('empresa_id', empresaId).limit(1).single()
+  if (!cfg?.instance_name) return Response.json({ error: 'Instância não configurada. Salve o nome da instância primeiro.' }, { status: 500 })
 
-  const headers = { 'Content-Type': 'application/json', apikey: cfg.api_key }
-  const base    = cfg.api_url
+  const apiUrl = process.env.EVOLUTION_API_URL ?? ''
+  const apiKey = process.env.EVOLUTION_API_KEY ?? ''
+  if (!apiUrl || !apiKey) return Response.json({ error: 'Evolution API não configurada no servidor.' }, { status: 500 })
+
+  const headers = { 'Content-Type': 'application/json', apikey: apiKey }
+  const base    = apiUrl
   const inst    = cfg.instance_name
   const instEnc = encodeURIComponent(inst)
 
@@ -99,13 +103,16 @@ export async function GET() {
 export async function DELETE() {
   const empresaId = await getEmpresaId()
   const supabase = supa()
-  const { data: cfg } = await supabase.from('wa_config').select('*').eq('empresa_id', empresaId).limit(1).single()
-  if (!cfg) return Response.json({ error: 'wa_config não encontrada' }, { status: 500 })
+  const { data: cfg } = await supabase.from('wa_config').select('instance_name').eq('empresa_id', empresaId).limit(1).single()
+  if (!cfg?.instance_name) return Response.json({ error: 'Instância não configurada.' }, { status: 500 })
+
+  const apiUrl = process.env.EVOLUTION_API_URL ?? ''
+  const apiKey = process.env.EVOLUTION_API_KEY ?? ''
 
   try {
     const res = await fetch(
-      `${cfg.api_url}/instance/logout/${encodeURIComponent(cfg.instance_name)}`,
-      { method: 'DELETE', headers: { apikey: cfg.api_key }, signal: AbortSignal.timeout(8000) },
+      `${apiUrl}/instance/logout/${encodeURIComponent(cfg.instance_name)}`,
+      { method: 'DELETE', headers: { apikey: apiKey }, signal: AbortSignal.timeout(8000) },
     )
     const data = await res.json()
     return Response.json({ ok: res.ok, data })

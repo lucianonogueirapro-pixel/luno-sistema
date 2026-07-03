@@ -4,30 +4,27 @@ import Link from 'next/link'
 import { PageHeader } from '@/components/ui/PageHeader'
 import {
   Wifi, WifiOff, RefreshCw, Loader2, Copy, CheckCircle2,
-  AlertCircle, Eye, EyeOff, Save, Webhook, ArrowLeft, Bug, Send,
+  AlertCircle, Save, Webhook, ArrowLeft, Bug, Send,
   Smartphone, LogOut, QrCode,
 } from 'lucide-react'
 
 interface Config {
   id?: string
-  api_url?: string
-  api_key?: string
   instance_name?: string
   webhook_token?: string
   ativo?: boolean
 }
 
 const STATUS_LABELS: Record<string, { label: string; cor: string; bg: string }> = {
-  open:            { label: 'Conectado',               cor: '#166534', bg: '#DCFCE7' },
+  open:            { label: 'Conectado',                    cor: '#166534', bg: '#DCFCE7' },
   close:           { label: 'Desconectado — escaneie o QR', cor: '#b45309', bg: '#FEF3C7' },
-  connecting:      { label: 'Conectando...',            cor: '#1E6B8A', bg: '#E0F2FE' },
-  not_configured:  { label: 'Não configurado',          cor: '#475569', bg: '#f8fafc' },
-  error:           { label: 'Erro de conexão',          cor: '#8B1A1A', bg: '#FEE2E2' },
+  connecting:      { label: 'Conectando...',                cor: '#1E6B8A', bg: '#E0F2FE' },
+  not_configured:  { label: 'Não configurado',              cor: '#475569', bg: '#f8fafc' },
+  error:           { label: 'Erro de conexão',              cor: '#8B1A1A', bg: '#FEE2E2' },
 }
 
 export default function AtendimentoIntegracaoPage() {
   const [cfg, setCfg] = useState<Config>({ ativo: false })
-  const [showKey, setShowKey] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [testando, setTestando] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
@@ -62,7 +59,7 @@ export default function AtendimentoIntegracaoPage() {
       })
       const data = await res.json()
       if (data.ok) {
-        setMsg({ tipo: 'ok', texto: 'Integração salva.' })
+        setMsg({ tipo: 'ok', texto: 'Configuração salva.' })
       } else {
         setMsg({ tipo: 'erro', texto: data.error ?? 'Erro ao salvar.' })
       }
@@ -162,7 +159,7 @@ export default function AtendimentoIntegracaoPage() {
     <div className="flex flex-col h-full">
       <PageHeader
         title="Integração WhatsApp"
-        subtitle="Evolution API · Conexão com o WhatsApp da empresa"
+        subtitle="Conecte o WhatsApp da sua empresa à Luna IA"
         action={
           <button
             onClick={salvar}
@@ -209,42 +206,11 @@ export default function AtendimentoIntegracaoPage() {
             </div>
           )}
 
-          {/* Evolution API */}
+          {/* Configuração da instância */}
           <section className="bg-white border border-[#e2e8f0] rounded-xl p-5 space-y-4">
             <h2 className="text-[11px] font-semibold text-[#0f172a] uppercase tracking-wide">
-              Evolution API
+              WhatsApp — Instância
             </h2>
-
-            <label className="block">
-              <span className="text-[10px] text-[#94a3b8] uppercase tracking-wide">URL da API</span>
-              <input
-                type="url"
-                value={cfg.api_url ?? ''}
-                onChange={e => setCfg(p => ({ ...p, api_url: e.target.value }))}
-                placeholder="https://sua-vps.com:8080"
-                className="mt-1 w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-[13px] text-[#0f172a] placeholder-[#94a3b8]/50 focus:outline-none focus:border-[#94a3b8]"
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-[10px] text-[#94a3b8] uppercase tracking-wide">API Key</span>
-              <div className="relative mt-1">
-                <input
-                  type={showKey ? 'text' : 'password'}
-                  value={cfg.api_key ?? ''}
-                  onChange={e => setCfg(p => ({ ...p, api_key: e.target.value }))}
-                  placeholder="Deixe em branco para manter a atual"
-                  className="w-full border border-[#e2e8f0] rounded-lg px-3 py-2 pr-10 text-[13px] text-[#0f172a] placeholder-[#94a3b8]/50 focus:outline-none focus:border-[#94a3b8]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowKey(v => !v)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#0f172a]"
-                >
-                  {showKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
-              </div>
-            </label>
 
             <label className="block">
               <span className="text-[10px] text-[#94a3b8] uppercase tracking-wide">Nome da instância</span>
@@ -252,9 +218,12 @@ export default function AtendimentoIntegracaoPage() {
                 type="text"
                 value={cfg.instance_name ?? ''}
                 onChange={e => setCfg(p => ({ ...p, instance_name: e.target.value }))}
-                placeholder="minha-empresa"
+                placeholder="ex: minha-empresa (sem espaços, sem acentos)"
                 className="mt-1 w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-[13px] text-[#0f172a] placeholder-[#94a3b8]/50 focus:outline-none focus:border-[#94a3b8]"
               />
+              <span className="text-[10px] text-[#94a3b8] mt-1 block">
+                Identificador único desta empresa na plataforma WhatsApp. Use letras, números e hífens.
+              </span>
             </label>
 
             {/* Ativo toggle */}
@@ -282,17 +251,12 @@ export default function AtendimentoIntegracaoPage() {
             <div className="flex items-center gap-3 pt-1 border-t border-[#f8fafc]">
               <button
                 onClick={testar}
-                disabled={testando || !cfg.api_url}
+                disabled={testando || !cfg.instance_name}
                 className="flex items-center gap-1.5 px-3 py-1.5 border border-[#e2e8f0] rounded-lg text-[11px] text-[#475569] hover:bg-[#f8fafc] disabled:opacity-40 transition-colors"
               >
                 {testando ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
                 Testar conexão
               </button>
-              {status && !statusCfg?.label.includes('Não') && (
-                <span className="text-[10px] text-[#94a3b8]">
-                  Última verificação agora
-                </span>
-              )}
             </div>
           </section>
 
@@ -352,7 +316,7 @@ export default function AtendimentoIntegracaoPage() {
                 ) : (
                   <button
                     onClick={iniciarQr}
-                    disabled={qrLoading || !cfg.api_url}
+                    disabled={qrLoading || !cfg.instance_name}
                     className="flex items-center gap-2 px-4 py-2.5 bg-[#0f172a] text-white text-[12px] rounded-lg hover:bg-[#374151] disabled:opacity-40 transition-colors"
                   >
                     {qrLoading ? <Loader2 size={13} className="animate-spin" /> : <QrCode size={13} />}
@@ -370,7 +334,7 @@ export default function AtendimentoIntegracaoPage() {
               Webhook
             </h2>
             <p className="text-[11px] text-[#475569]">
-              Configure este endereço na Evolution API para receber mensagens:
+              Endereço configurado automaticamente para receber mensagens:
             </p>
             <div className="flex items-center gap-2 px-3 py-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg">
               <code className="flex-1 text-[11px] text-[#0f172a] break-all">{webhookUrl}</code>
@@ -396,7 +360,7 @@ export default function AtendimentoIntegracaoPage() {
                     })
                     const data = await res.json()
                     if (data.ok) {
-                      setWhMsg({ ok: true, texto: 'Webhook registrado na Evolution API!' })
+                      setWhMsg({ ok: true, texto: 'Webhook registrado com sucesso!' })
                     } else {
                       setWhMsg({ ok: false, texto: data.error ?? 'Erro ao registrar.' })
                     }
@@ -406,7 +370,7 @@ export default function AtendimentoIntegracaoPage() {
                     setRegistrandoWh(false)
                   }
                 }}
-                disabled={registrandoWh || !cfg.api_url}
+                disabled={registrandoWh || !cfg.instance_name}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0f172a] text-white text-[11px] rounded-lg hover:bg-[#374151] disabled:opacity-40 transition-colors"
               >
                 {registrandoWh ? <Loader2 size={12} className="animate-spin" /> : <Webhook size={12} />}
@@ -418,17 +382,6 @@ export default function AtendimentoIntegracaoPage() {
                 </span>
               )}
             </div>
-
-            <label className="block">
-              <span className="text-[10px] text-[#94a3b8] uppercase tracking-wide">Token de validação (opcional)</span>
-              <input
-                type="text"
-                value={cfg.webhook_token ?? ''}
-                onChange={e => setCfg(p => ({ ...p, webhook_token: e.target.value }))}
-                placeholder="Token secreto para validar requisições"
-                className="mt-1 w-full border border-[#e2e8f0] rounded-lg px-3 py-2 text-[13px] text-[#0f172a] placeholder-[#94a3b8]/50 focus:outline-none focus:border-[#94a3b8]"
-              />
-            </label>
           </section>
 
           {/* Diagnóstico de envio */}
@@ -438,8 +391,7 @@ export default function AtendimentoIntegracaoPage() {
               Diagnóstico de Envio
             </h2>
             <p className="text-[10px] text-[#94a3b8]">
-              Testa a conexão e tenta enviar uma mensagem de teste — mostra o erro exato do Evolution API.
-              Informe o número com DDI para testar o envio (ex: 5586994361010).
+              Testa a conexão e tenta enviar uma mensagem de teste. Informe o número com DDI (ex: 5586994361010).
             </p>
             <div className="flex items-center gap-2">
               <input
@@ -461,13 +413,11 @@ export default function AtendimentoIntegracaoPage() {
 
             {diagResult && (
               <div className="space-y-2">
-                {/* Config */}
                 <DiagRow
                   label="Config"
                   ok={!!(diagResult.config as any)?.has_key && !!(diagResult.config as any)?.api_url}
                   body={JSON.stringify(diagResult.config, null, 2)}
                 />
-                {/* Estado da instância */}
                 {(() => {
                   const stateBody = (diagResult.state as any)?.body ?? ''
                   const isOpen = typeof stateBody === 'string' && stateBody.includes('"open"')
@@ -481,7 +431,6 @@ export default function AtendimentoIntegracaoPage() {
                     />
                   )
                 })()}
-                {/* Envio v2.1+ */}
                 {!(diagResult.send_v2 as any)?.skipped && (
                   <DiagRow
                     label="Envio formato v2.1+ (text)"
@@ -490,7 +439,6 @@ export default function AtendimentoIntegracaoPage() {
                     body={(diagResult.send_v2 as any)?.body ?? JSON.stringify(diagResult.send_v2)}
                   />
                 )}
-                {/* Envio legado */}
                 {!(diagResult.send_legacy as any)?.skipped && (
                   <DiagRow
                     label="Envio formato legado (textMessage.text)"
@@ -499,16 +447,14 @@ export default function AtendimentoIntegracaoPage() {
                     body={(diagResult.send_legacy as any)?.body ?? JSON.stringify(diagResult.send_legacy)}
                   />
                 )}
-                {/* Envio JID */}
                 {!(diagResult.send_jid as any)?.skipped && (
                   <DiagRow
-                    label={`Envio formato JID (@s.whatsapp.net)`}
+                    label="Envio formato JID (@s.whatsapp.net)"
                     ok={(diagResult.send_jid as any)?.ok === true}
                     statusCode={(diagResult.send_jid as any)?.status}
                     body={(diagResult.send_jid as any)?.body ?? JSON.stringify(diagResult.send_jid)}
                   />
                 )}
-                {/* Lista de instâncias */}
                 <DiagRow
                   label="Instâncias na VPS"
                   ok={(diagResult.instances as any)?.ok === true}
@@ -517,31 +463,6 @@ export default function AtendimentoIntegracaoPage() {
                 />
               </div>
             )}
-          </section>
-
-          {/* Guia rápido */}
-          <section className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5">
-            <h2 className="text-[11px] font-semibold text-[#0f172a] uppercase tracking-wide mb-3">
-              Como conectar
-            </h2>
-            <ol className="space-y-2">
-              {[
-                'Contrate uma VPS (Hostinger ou DigitalOcean) — Ubuntu 22.04, 2GB RAM',
-                'Instale a Evolution API com Docker na VPS',
-                'Crie a instância com o nome escolhido acima',
-                'Escaneie o QR Code que a Evolution API gera com o WhatsApp da empresa',
-                'Preencha os campos acima e clique Salvar',
-                'Configure o webhook na Evolution API apontando para a URL acima',
-                'Ative a integração e clique Testar conexão',
-              ].map((passo, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-[11px] text-[#475569]">
-                  <span className="w-4 h-4 rounded-full bg-[#4f46e5] text-white text-[8px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                  {passo}
-                </li>
-              ))}
-            </ol>
           </section>
 
         </div>

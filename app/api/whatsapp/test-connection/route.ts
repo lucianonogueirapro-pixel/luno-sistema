@@ -8,14 +8,19 @@ export async function GET(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
-  const { data: cfg } = await supabase.from('wa_config').select('*').eq('empresa_id', empresaId).limit(1).single()
-  if (!cfg) return Response.json({ error: 'wa_config não encontrada' }, { status: 500 })
+  const { data: cfg } = await supabase.from('wa_config').select('instance_name').eq('empresa_id', empresaId).limit(1).single()
+  if (!cfg?.instance_name) return Response.json({ error: 'Instância não configurada.' }, { status: 500 })
 
-  const stateUrl     = `${cfg.api_url}/instance/connectionState/${cfg.instance_name}`
-  const instancesUrl = `${cfg.api_url}/instance/fetchInstances`
-  const sendUrl      = `${cfg.api_url}/message/sendText/${cfg.instance_name}`
+  const apiUrl = process.env.EVOLUTION_API_URL ?? ''
+  const apiKey = process.env.EVOLUTION_API_KEY ?? ''
+  if (!apiUrl || !apiKey) return Response.json({ error: 'Evolution API não configurada no servidor.' }, { status: 500 })
+
+  const instEnc      = encodeURIComponent(cfg.instance_name)
+  const stateUrl     = `${apiUrl}/instance/connectionState/${instEnc}`
+  const instancesUrl = `${apiUrl}/instance/fetchInstances`
+  const sendUrl      = `${apiUrl}/message/sendText/${instEnc}`
   const testPhone    = req.nextUrl.searchParams.get('phone') ?? ''
-  const headers      = { 'Content-Type': 'application/json', apikey: cfg.api_key }
+  const headers      = { 'Content-Type': 'application/json', apikey: apiKey }
 
   // 1. Status da instância
   let stateResult: Record<string, unknown> = {}
@@ -78,12 +83,10 @@ export async function GET(req: NextRequest) {
 
   return Response.json({
     config: {
-      api_url: cfg.api_url,
+      api_url: apiUrl,
       instance: cfg.instance_name,
-      ativo: cfg.ativo,
-      auto_responder: cfg.auto_responder,
-      has_key: !!cfg.api_key,
-      key_prefix: cfg.api_key ? String(cfg.api_key).slice(0, 6) + '...' : null,
+      has_key: !!apiKey,
+      key_prefix: apiKey ? String(apiKey).slice(0, 6) + '...' : null,
     },
     state: stateResult,
     instances: instancesList,

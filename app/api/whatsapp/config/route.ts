@@ -4,7 +4,15 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { getEmpresaId } from '@/lib/empresa.server'
 import { getInstanceStatus, setWebhook } from '@/lib/whatsapp/evolution'
 
-const CONFIG_FIELDS = 'id, empresa_id, api_url, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, prompt_laura, webhook_token, creditos_usd, modelo_laura, horario_inicio, horario_fim, sabado_ativo, sabado_inicio, sabado_fim, duracao_avaliacao_min, slots_antecipacao_dias, nome, tag_padrao, slots_manuais'
+// Credenciais da Evolution API — centralizadas em env vars, nunca expostas ao cliente
+function evolutionCreds() {
+  return {
+    apiUrl: process.env.EVOLUTION_API_URL ?? '',
+    apiKey: process.env.EVOLUTION_API_KEY ?? '',
+  }
+}
+
+const CONFIG_FIELDS = 'id, empresa_id, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, prompt_laura, webhook_token, creditos_usd, modelo_laura, horario_inicio, horario_fim, sabado_ativo, sabado_inicio, sabado_fim, duracao_avaliacao_min, slots_antecipacao_dias, nome, tag_padrao, slots_manuais'
 
 function adminClient() {
   return createServiceClient(
@@ -28,7 +36,7 @@ export async function GET(req: NextRequest) {
     data = d
   }
 
-  // Não retorna api_key na resposta (segurança)
+  // api_url e api_key nunca são enviados ao cliente — ficam no servidor
   return Response.json(data ?? null)
 }
 
@@ -38,8 +46,6 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json() as {
     id?: string
-    api_url?: string
-    api_key?: string
     instance_name?: string
     ativo?: boolean
     auto_responder?: boolean
@@ -64,20 +70,25 @@ export async function POST(req: NextRequest) {
 
   const configId = body.id
 
-  let existing: { id: string; api_key: string } | null = null
+  let existing: { id: string } | null = null
   if (configId) {
-    const { data } = await admin.from('wa_config').select('id, api_key').eq('id', configId).eq('empresa_id', empresaId).single()
+    const { data } = await admin.from('wa_config').select('id').eq('id', configId).eq('empresa_id', empresaId).single()
     existing = data
   } else {
-    const { data } = await admin.from('wa_config').select('id, api_key').eq('empresa_id', empresaId).limit(1).single()
+    const { data } = await admin.from('wa_config').select('id').eq('empresa_id', empresaId).limit(1).single()
     existing = data
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id: _id, ...bodyWithoutId } = body
-  const payload = { ...bodyWithoutId, empresa_id: empresaId, updated_at: new Date().toISOString() }
-  if (!body.api_key && existing?.api_key) {
-    delete payload.api_key
+
+  // Credenciais da Evolution API sempre vêm do servidor — cliente não tem acesso
+  const creds = evolutionCreds()
+  const payload = {
+    ...bodyWithoutId,
+    empresa_id: empresaId,
+    updated_at: new Date().toISOString(),
+    ...(creds.apiUrl ? { api_url: creds.apiUrl } : {}),
+    ...(creds.apiKey ? { api_key: creds.apiKey } : {}),
   }
 
   let saved
@@ -86,7 +97,7 @@ export async function POST(req: NextRequest) {
       .from('wa_config')
       .update(payload)
       .eq('id', existing.id)
-      .select('id, empresa_id, api_url, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
+      .select('id, empresa_id, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
       .single()
     if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
     saved = data
@@ -94,13 +105,13 @@ export async function POST(req: NextRequest) {
     const { data, error } = await admin
       .from('wa_config')
       .insert(payload)
-      .select('id, empresa_id, api_url, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
+      .select('id, empresa_id, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
       .single()
     if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
     saved = data
   }
 
-  return Response.json({ ok: true, config: saved, _debug: { empresaId } })
+  return Response.json({ ok: true, config: saved })
 }
 
 // Registra webhook na Evolution API
@@ -109,13 +120,18 @@ export async function PATCH(req: NextRequest) {
   const supabase = await createClient()
 
   const { webhookUrl } = await req.json() as { webhookUrl: string }
-  const { data: cfg } = await supabase.from('wa_config').select('*').eq('empresa_id', empresaId).limit(1).single()
-  if (!cfg?.api_url || !cfg?.api_key || !cfg?.instance_name) {
-    return Response.json({ ok: false, error: 'Evolution API não configurada.' })
+  const { data: cfg } = await supabase.from('wa_config').select('instance_name').eq('empresa_id', empresaId).limit(1).single()
+  if (!cfg?.instance_name) {
+    return Response.json({ ok: false, error: 'Instância não configurada.' })
+  }
+
+  const creds = evolutionCreds()
+  if (!creds.apiUrl || !creds.apiKey) {
+    return Response.json({ ok: false, error: 'Evolution API não configurada no servidor.' })
   }
 
   const result = await setWebhook(
-    { apiUrl: cfg.api_url, apiKey: cfg.api_key, instance: cfg.instance_name },
+    { apiUrl: creds.apiUrl, apiKey: creds.apiKey, instance: cfg.instance_name },
     webhookUrl,
   )
   return Response.json(result)
@@ -126,14 +142,19 @@ export async function PUT() {
   const empresaId = await getEmpresaId()
   const supabase = await createClient()
 
-  const { data: cfg } = await supabase.from('wa_config').select('*').eq('empresa_id', empresaId).limit(1).single()
-  if (!cfg?.api_url || !cfg?.api_key || !cfg?.instance_name) {
+  const { data: cfg } = await supabase.from('wa_config').select('instance_name').eq('empresa_id', empresaId).limit(1).single()
+  if (!cfg?.instance_name) {
+    return Response.json({ status: 'not_configured' })
+  }
+
+  const creds = evolutionCreds()
+  if (!creds.apiUrl || !creds.apiKey) {
     return Response.json({ status: 'not_configured' })
   }
 
   const status = await getInstanceStatus({
-    apiUrl: cfg.api_url,
-    apiKey: cfg.api_key,
+    apiUrl: creds.apiUrl,
+    apiKey: creds.apiKey,
     instance: cfg.instance_name,
   })
 

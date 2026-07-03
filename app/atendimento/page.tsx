@@ -76,7 +76,7 @@ export default async function AtendimentoPage() {
             ? `Conectado — ${cfgs?.filter(c => c.ativo).map(c => c.nome || c.instance_name).join(', ')}`
             : 'Desconectado — configure a integração para ativar'}
           {!algumAtivo && (
-            <Link href="/atendimento/configuracoes" className="ml-auto text-[11px] underline">
+            <Link href="/atendimento/integracao" className="ml-auto text-[11px] underline">
               Configurar agora
             </Link>
           )}

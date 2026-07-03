@@ -265,7 +265,7 @@ function AtendimentoConfigPageInner() {
                     type="text"
                     value={cfg.nome_agente ?? ''}
                     onChange={e => setCfg(p => ({ ...p, nome_agente: e.target.value }))}
-                    placeholder="ex: Luna, Laura, Ana..."
+                    placeholder="ex: Luna, Ana, Sofia..."
                     className="w-48 border border-[#e2e8f0] rounded-lg px-3 py-1.5 text-[12px] text-[#0f172a] placeholder-[#94a3b8]/50 focus:outline-none focus:border-[#94a3b8]"
                   />
                   <p className="text-[10px] text-[#94a3b8] mt-1">

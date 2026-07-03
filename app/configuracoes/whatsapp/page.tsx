@@ -285,7 +285,7 @@ export default function AtendimentoIntegracaoPage() {
             ) : (
               <div className="space-y-3">
                 <p className="text-[11px] text-[#475569]">
-                  Clique em "Gerar QR Code", depois escaneie com o WhatsApp do número que vai ser usado pela Luna.
+                  Clique em "Gerar QR Code", depois escaneie com o WhatsApp do número que vai ser usado pela empresa.
                 </p>
 
                 {qrError && (

@@ -364,7 +364,7 @@ export function Sidebar() {
                       locked={isLocked}
                       planoAtual={plano}
                     />
-                    {item.children && parentActive && (
+                    {item.children && !isLocked && (
                       <div
                         className="ml-6 mr-2 mb-0.5 border-l pl-2 space-y-0.5"
                         style={{ borderColor: hex(section.color, 0.25) }}

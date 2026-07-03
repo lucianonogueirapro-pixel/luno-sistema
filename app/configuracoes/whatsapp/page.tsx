@@ -174,9 +174,9 @@ export default function AtendimentoIntegracaoPage() {
 
       <div className="flex-1 overflow-auto px-6 py-5">
         <div className="max-w-2xl space-y-5">
-          <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-[11px] text-[#94a3b8] hover:text-[#0f172a] transition-colors">
+          <Link href="/configuracoes" className="inline-flex items-center gap-1.5 text-[11px] text-[#94a3b8] hover:text-[#0f172a] transition-colors">
             <ArrowLeft size={12} />
-            Voltar ao sistema
+            Voltar às Configurações
           </Link>
 
           {/* Feedback */}

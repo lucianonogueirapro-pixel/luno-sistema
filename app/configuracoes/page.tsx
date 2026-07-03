@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { BackButton } from '@/components/ui/BackButton'
 import {
   Users, Bell, ChevronRight, Building2,
-  Landmark, Receipt, Bot,
+  Landmark, Receipt, Bot, Plug, SlidersHorizontal,
 } from 'lucide-react'
 
 type ConfigItem = {
@@ -28,8 +28,20 @@ const grupos: { titulo: string; itens: ConfigItem[] }[] = [
     ],
   },
   {
-    titulo: 'Comunicação',
+    titulo: 'WhatsApp & Luna IA',
     itens: [
+      {
+        href: '/configuracoes/whatsapp',
+        icon: Plug,
+        label: 'Integração WhatsApp',
+        desc: 'Nome da instância, QR Code de conexão e webhook',
+      },
+      {
+        href: '/configuracoes/luna',
+        icon: SlidersHorizontal,
+        label: 'Configuração da Luna',
+        desc: 'Prompt, horários, follow-up automático e modelo de IA',
+      },
       {
         href: '/configuracoes/mensagens-auto',
         icon: Bell,

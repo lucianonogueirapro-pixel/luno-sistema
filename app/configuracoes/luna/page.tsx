@@ -2,7 +2,6 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Save, Zap, AlertCircle, CheckCircle2, Loader2, DollarSign, Clock, CalendarDays, X, Plus, Bot } from 'lucide-react'
 import { BackButton } from '@/components/ui/BackButton'
@@ -118,9 +117,6 @@ interface Config {
 }
 
 function AtendimentoConfigPageInner() {
-  const searchParams = useSearchParams()
-  const fromConfig = searchParams.get('from') === 'configuracoes'
-
   const [instancias, setInstancias] = useState<Instancia[]>([])
   const [abaAtiva, setAbaAtiva] = useState<string>('')
   const [cfg, setCfg] = useState<Config>({
@@ -212,10 +208,7 @@ function AtendimentoConfigPageInner() {
 
       <div className="flex-1 overflow-auto px-6 py-5">
         <div className="max-w-2xl space-y-5">
-          <BackButton
-            href={fromConfig ? '/configuracoes' : '/atendimento'}
-            label={fromConfig ? 'Voltar às Configurações' : 'Voltar ao Atendimento'}
-          />
+          <BackButton href="/configuracoes" label="Voltar às Configurações" />
 
           {msg && (
             <div className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] border ${

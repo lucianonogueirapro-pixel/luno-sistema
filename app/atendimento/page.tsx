@@ -54,7 +54,7 @@ export default async function AtendimentoPage() {
         subtitle="Agente de atendimento 24/7 via WhatsApp"
         action={
           <Link
-            href="/atendimento/configuracoes"
+            href="/configuracoes/luna"
             className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] text-[#475569] border border-[#e2e8f0] rounded-lg hover:bg-[#f8fafc] transition-colors"
           >
             <Settings size={12} />
@@ -76,7 +76,7 @@ export default async function AtendimentoPage() {
             ? `Conectado — ${cfgs?.filter(c => c.ativo).map(c => c.nome || c.instance_name).join(', ')}`
             : 'Desconectado — configure a integração para ativar'}
           {!algumAtivo && (
-            <Link href="/atendimento/integracao" className="ml-auto text-[11px] underline">
+            <Link href="/configuracoes/whatsapp" className="ml-auto text-[11px] underline">
               Configurar agora
             </Link>
           )}

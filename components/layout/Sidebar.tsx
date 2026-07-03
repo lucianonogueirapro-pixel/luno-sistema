@@ -53,10 +53,6 @@ const sections: Section[] = [
         href: '/atendimento',
         icon: MessageSquare,
         label: 'Luna IA',
-        children: [
-          { href: '/atendimento/integracao',    label: 'Integração WhatsApp', icon: Plug },
-          { href: '/atendimento/configuracoes', label: 'Configuração Luna',   icon: SlidersHorizontal },
-        ],
       },
     ],
   },
@@ -73,7 +69,15 @@ const sections: Section[] = [
     label: 'Sistema',
     color: '#c084fc',
     items: [
-      { href: '/configuracoes', icon: Settings, label: 'Configurações' },
+      {
+        href: '/configuracoes',
+        icon: Settings,
+        label: 'Configurações',
+        children: [
+          { href: '/configuracoes/whatsapp', label: 'Integração WhatsApp', icon: Plug },
+          { href: '/configuracoes/luna',     label: 'Configuração Luna',   icon: SlidersHorizontal },
+        ],
+      },
     ],
   },
 ]

@@ -17,10 +17,11 @@ export async function GET() {
   const headers = { 'Content-Type': 'application/json', apikey: cfg.api_key }
   const base    = cfg.api_url
   const inst    = cfg.instance_name
+  const instEnc = encodeURIComponent(inst)
 
   try {
     // 1. Verifica estado atual
-    const stateRes = await fetch(`${base}/instance/connectionState/${inst}`, { headers, signal: AbortSignal.timeout(8000) })
+    const stateRes = await fetch(`${base}/instance/connectionState/${instEnc}`, { headers, signal: AbortSignal.timeout(8000) })
     const stateData = await stateRes.json().catch(() => ({}))
     const state = stateData?.instance?.state ?? stateData?.state ?? 'unknown'
 
@@ -29,7 +30,7 @@ export async function GET() {
     }
 
     // 2. Tenta conectar a instância existente (sem deletar a sessão)
-    const connectRes = await fetch(`${base}/instance/connect/${inst}`, { headers, signal: AbortSignal.timeout(15000) })
+    const connectRes = await fetch(`${base}/instance/connect/${instEnc}`, { headers, signal: AbortSignal.timeout(15000) })
     const connectData = await connectRes.json().catch(() => null)
 
     const qrBase64 = connectData?.base64 ?? connectData?.qrcode?.base64 ?? null
@@ -103,7 +104,7 @@ export async function DELETE() {
 
   try {
     const res = await fetch(
-      `${cfg.api_url}/instance/logout/${cfg.instance_name}`,
+      `${cfg.api_url}/instance/logout/${encodeURIComponent(cfg.instance_name)}`,
       { method: 'DELETE', headers: { apikey: cfg.api_key }, signal: AbortSignal.timeout(8000) },
     )
     const data = await res.json()

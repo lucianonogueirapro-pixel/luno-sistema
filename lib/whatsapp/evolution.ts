@@ -14,7 +14,7 @@ export async function sendText(
   to: string,
   text: string,
 ): Promise<SendTextResult> {
-  const url = `${cfg.apiUrl}/message/sendText/${cfg.instance}`
+  const url = `${cfg.apiUrl}/message/sendText/${encodeURIComponent(cfg.instance)}`
   const headers = { 'Content-Type': 'application/json', apikey: cfg.apiKey }
   const signal = AbortSignal.timeout(15000)
 
@@ -55,7 +55,7 @@ export async function sendText(
 
 export async function setWebhook(cfg: EvolutionConfig, webhookUrl: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    const res = await fetch(`${cfg.apiUrl}/webhook/set/${cfg.instance}`, {
+    const res = await fetch(`${cfg.apiUrl}/webhook/set/${encodeURIComponent(cfg.instance)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: cfg.apiKey },
       body: JSON.stringify({
@@ -80,7 +80,7 @@ export async function setWebhook(cfg: EvolutionConfig, webhookUrl: string): Prom
 export async function getInstanceStatus(cfg: EvolutionConfig): Promise<string> {
   try {
     const res = await fetch(
-      `${cfg.apiUrl}/instance/connectionState/${cfg.instance}`,
+      `${cfg.apiUrl}/instance/connectionState/${encodeURIComponent(cfg.instance)}`,
       { headers: { apikey: cfg.apiKey } },
     )
     if (!res.ok) return 'disconnected'
@@ -100,7 +100,7 @@ export function formatPhone(raw: string): string {
 }
 
 // Extrai texto da mensagem no payload do webhook
-// Retorna placeholder para mídia (foto, vídeo, áudio) para Laura poder continuar o fluxo
+// Retorna placeholder para mídia (foto, vídeo, áudio) para Luna poder continuar o fluxo
 export function extractMessageText(data: Record<string, unknown>): string | null {
   const msg = data?.message as Record<string, unknown> | undefined
   if (!msg) return null

@@ -391,7 +391,7 @@ export default function ClinicaConfigPage() {
                 Contexto para os Agentes de IA
               </h2>
               <p className="text-[10px] text-[#94a3b8] mt-1">
-                Tudo que você registrar aqui é injetado automaticamente no contexto de todos os agentes (Laura, Ravi, etc.).
+                Tudo que você registrar aqui é injetado automaticamente no contexto de todos os agentes (Luna, etc.).
                 Clique no microfone e fale — a transcrição é automática.
               </p>
             </div>

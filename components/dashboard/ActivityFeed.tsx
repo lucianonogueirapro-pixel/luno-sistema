@@ -14,7 +14,7 @@ type FeedItem = {
 const TIPO: Record<string, { dot: string; tag: string }> = {
   crm_lead:          { dot: '#34d399', tag: 'CRM'     },
   crm_qualificado:   { dot: '#38bdf8', tag: 'CRM'     },
-  laura_resposta:    { dot: '#22d3ee', tag: 'Laura'   },
+  laura_resposta:    { dot: '#22d3ee', tag: 'Luna'    },
   agenda_nova:       { dot: '#818cf8', tag: 'Agenda'  },
   agenda_confirmada: { dot: '#34d399', tag: 'Agenda'  },
 }

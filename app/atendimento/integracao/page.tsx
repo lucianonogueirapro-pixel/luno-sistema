@@ -261,7 +261,7 @@ export default function AtendimentoIntegracaoPage() {
             <div className="flex items-center justify-between pt-1">
               <div>
                 <div className="text-[12px] font-medium text-[#0f172a]">Integração ativa</div>
-                <div className="text-[10px] text-[#94a3b8]">Liga a Laura para responder mensagens</div>
+                <div className="text-[10px] text-[#94a3b8]">Liga a Luna para responder mensagens</div>
               </div>
               <button
                 onClick={() => setCfg(p => ({ ...p, ativo: !p.ativo }))}
@@ -321,7 +321,7 @@ export default function AtendimentoIntegracaoPage() {
             ) : (
               <div className="space-y-3">
                 <p className="text-[11px] text-[#475569]">
-                  Clique em "Gerar QR Code", depois escaneie com o WhatsApp do número que vai ser usado pela Laura.
+                  Clique em "Gerar QR Code", depois escaneie com o WhatsApp do número que vai ser usado pela Luna.
                 </p>
 
                 {qrError && (

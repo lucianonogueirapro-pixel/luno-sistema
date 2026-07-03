@@ -82,23 +82,25 @@ export async function POST(req: NextRequest) {
 
   let saved
   if (existing?.id) {
-    const { data } = await admin
+    const { data, error } = await admin
       .from('wa_config')
       .update(payload)
       .eq('id', existing.id)
       .select('id, empresa_id, api_url, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
       .single()
+    if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
     saved = data
   } else {
-    const { data } = await admin
+    const { data, error } = await admin
       .from('wa_config')
       .insert(payload)
       .select('id, empresa_id, api_url, instance_name, ativo, auto_responder, followup_delay_horas, followup2_horas, followup3_horas, webhook_token')
       .single()
+    if (error) return Response.json({ ok: false, error: error.message }, { status: 500 })
     saved = data
   }
 
-  return Response.json({ ok: true, config: saved })
+  return Response.json({ ok: true, config: saved, _debug: { empresaId } })
 }
 
 // Registra webhook na Evolution API

@@ -28,6 +28,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/update-password') ||
     pathname.startsWith('/f/') ||
+    pathname.startsWith('/site') ||
     pathname === '/clientes'
 
   if (!user && !isPublic) {
